@@ -11,7 +11,6 @@ Realtime speech → OLED display. The PC app captures system playback audio dire
 - **Premium Retro-Brutalist GUI**: Styled with the custom **Vin Mono Pro** font family (Regular, Bold, Thin) in a portrait vertical layout (geometry `740x740`) with rounded corner fillets, a solid black backdrop (`#000000`), and borderless deep gray panels (`#121212`).
 - **Upscaled Realtime Preview**: A 3x upscaled `384x192` simulation of the OLED display showing layouts, active waveforms, and VU meters.
 - **English Focus**: Speech auto-detect filters out non-English languages and displays the idle waveform.
-- **Nudge Text Controls**: ◄, ▲, ▼, ► direction D-pad buttons to adjust the X and Y coordinates of custom fonts by ±1px increments.
 - **Music Mode & Visualizer Selector**: Includes a Music Mode toggle to disable silence clearing timeout and Whisper VAD, alongside selector dropdowns for idle visualizers (Sine Wave, Stereo Bars, Radial Ring).
 - **GIF Player Mode**: Load and play custom animated GIFs on the physical OLED screen with controls for scaling (aspect ratio vs. stretch), playback speed multiplier (0.25x to 3.0x), dithering (Threshold vs. Floyd-Steinberg), threshold level, and color inversion.
 - **PC Stats Dashboard**: Display live PC performance metrics in a custom retro-brutalist layout: Ryzen CPU Name, Frequency, CPU Temperature (native driver-level query via bundled dll), GPU Name, Temp, Core Clock, GPU utilization, and Video Memory (VRAM) usage in Gigabytes (e.g. `Mem: 2.4GB`). Falls back to RAM, Disk usage, and local time if GPU monitoring is disabled.
