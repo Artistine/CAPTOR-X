@@ -1,0 +1,967 @@
+@font-face {
+  font-family: "Vin Mono Pro";
+  src: url("../fonts/VinMonoPro-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Vin Mono Pro";
+  src: url("../fonts/VinMonoPro-Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
+
+@import "tailwindcss";
+
+:root {
+  /* Dimensions */
+  --window-width: 1440px;
+  --window-height: 1020px;
+  
+  /* Color Palette */
+  --bg-window: #111111;           /* Deep charcoal main backdrop */
+  --bg-card: #181818;             /* Dark grey card container panels */
+  --bg-control: #252525;          /* Lighter grey for dropdowns, buttons, inputs */
+  --bg-control-hover: #333333;    /* Highlight grey on hover */
+  
+  --color-green: #11FF00;         /* Active / Online / Success */
+  --color-red: #FF0038;           /* Stop / Offline */
+  --color-orange: #FF9100;        /* Connecting / Warning (Unapplied settings) */
+  --color-yellow: #eab308;        /* Connecting / Handshake status */
+  
+  --text-primary: #FFFFFF;        /* Bright white text */
+  --text-muted: #E4E4E4;          /* Soft grey labels & inputs */
+  --border-color: #444444;        /* Inactive border boundaries */
+
+  /* Fonts */
+  --font-ui: "Vin Mono Pro", ui-monospace, SFMono-Regular, "JetBrains Mono", monospace;
+}
+
+/* Base Desktop Reset and Optimizations */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #090909;
+  font-family: var(--font-ui);
+  color: var(--text-primary);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+/* Scale Shell Container for Fluid Responsiveness in IFrames */
+.viewport-shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  background-color: #090909;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Fixed Dimension App Container representing the Webview Window */
+.app-container {
+  width: var(--window-width);
+  height: var(--window-height);
+  background-color: var(--bg-window);
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+  transform-origin: center center;
+  flex-shrink: 0;
+}
+
+/* Image drag disabled for UI elements */
+img {
+  -webkit-user-drag: none;
+  user-drag: none;
+  pointer-events: none;
+}
+
+/* Remove Form Outline Focus Rings */
+*:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Global COM Port configuration bar (Header positions fixed in upper right) */
+.global-com-bar {
+  position: absolute;
+  top: 30px;
+  right: 40px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 100;
+}
+
+/* Form Controls and Dropdowns */
+.dropdown-wrapper {
+  position: relative;
+  width: 140px;
+}
+
+.dropdown {
+  width: 100%;
+  height: 38px;
+  background-color: var(--bg-control);
+  border: 1px solid transparent;
+  color: var(--text-primary);
+  border-radius: 12px;
+  padding: 0 40px 0 16px;
+  font-size: 14px;
+  font-family: var(--font-ui);
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dropdown:hover {
+  background-color: var(--bg-control-hover);
+  border-color: #444444;
+}
+
+.dropdown:active {
+  transform: scale(0.98);
+}
+
+.dropdown-arrow {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--text-muted);
+  width: 16px;
+  height: 16px;
+}
+
+/* Icon Buttons in header bar */
+.icon-btn {
+  width: 44px;
+  height: 44px;
+  background-color: var(--bg-control);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.icon-btn:hover {
+  background-color: var(--bg-control-hover);
+  color: var(--text-primary);
+  border-color: #444444;
+}
+
+.icon-btn:active {
+  transform: scale(0.9);
+}
+
+.icon-btn.active {
+  background-color: var(--color-green);
+  color: #111111;
+}
+
+/* Interactive Views */
+.view {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+.view.active {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
+
+/* Device Selection View (Initial view) */
+.devices-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.device-selection-card {
+  width: 600px;
+  height: 560px;
+  background-color: var(--bg-card);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
+}
+
+.device-selection-card:hover {
+  transform: scale(1.02);
+  background-color: #1c1c1c;
+}
+
+.device-selection-card:active {
+  transform: scale(0.99);
+}
+
+.device-render {
+  width: 450px;
+  height: auto;
+  margin-bottom: 24px;
+  filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6));
+}
+
+.status-indicator-devices {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 10px currentColor;
+  transform: translateY(-1.5px);
+}
+
+.status-dot.green {
+  background-color: var(--color-green);
+  color: var(--color-green);
+  animation: pulse-green 1.8s infinite alternate;
+}
+
+.status-dot.red {
+  background-color: var(--color-red);
+  color: var(--color-red);
+}
+
+.status-dot.orange {
+  background-color: var(--color-orange);
+  color: var(--color-orange);
+  animation: pulse-orange 1.2s infinite alternate;
+}
+
+.status-dot.yellow {
+  background-color: var(--color-yellow);
+  color: var(--color-yellow);
+  animation: pulse-yellow 1.8s infinite alternate;
+}
+
+.status-text {
+  color: var(--text-muted);
+}
+
+.status-connected {
+  color: var(--color-green) !important;
+}
+
+.status-connecting {
+  color: var(--color-yellow) !important;
+}
+
+.status-disconnected {
+  color: var(--color-red) !important;
+}
+
+/* Dashboard Layout */
+.dashboard-top-card {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  width: 1360px;
+  height: 620px;
+  background-color: var(--bg-card);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 15px 45px rgba(0,0,0,0.5);
+  overflow: hidden;
+}
+
+.status-indicator-dashboard {
+  position: absolute;
+  top: 98px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+
+/* Interactive Device render inside dashboard */
+.device-preview-wrapper {
+  position: relative;
+  width: 792px;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0px;
+}
+
+.device-preview-render {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 25px 40px rgba(0,0,0,0.7));
+}
+
+/* Precise positioning of simulated OLED screen relative to device vectors */
+.device-screen-overlay {
+  position: absolute;
+  background-color: #0c0c0c;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid #1a1a1a;
+  box-shadow: inset 0 0 15px rgba(0,0,0,0.9);
+}
+
+
+
+#live-visualizer-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background-color: transparent;
+  z-index: 5;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+#oled-preview-text-line {
+  position: absolute;
+  bottom: 8px;
+  width: calc(100% - 16px);
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--color-green);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+  z-index: 10;
+  text-shadow: 0 0 4px rgba(17, 255, 0, 0.6);
+}
+
+/* Mode Switcher capsule */
+.mode-selector-pill {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  width: 240px;
+  height: 38px;
+  background-color: #0c0c0c;
+  border-radius: 19px;
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  gap: 0px;
+  box-sizing: border-box;
+}
+
+.mode-btn {
+  position: relative;
+  flex: 1;
+  height: 32px;
+  border-radius: 16px;
+  background-color: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  transition: color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.mode-btn:hover {
+  color: var(--text-primary);
+}
+
+.mode-btn.active {
+  color: var(--text-primary);
+}
+
+/* Action controls capsule (Apply & Start/Stop) */
+.action-control-pill {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  height: 64px;
+  background-color: var(--bg-control);
+  border-radius: 32px;
+  display: flex;
+  align-items: center;
+  padding: 4px 12px;
+  gap: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.apply-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background-color: #1f1f1f;
+  color: #777777;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.apply-btn:hover {
+  background-color: #2b2b2b;
+  color: var(--text-primary);
+}
+
+.apply-btn:active {
+  transform: scale(0.92);
+}
+
+/* Class to activate orange warning state when fields are modified */
+.apply-btn.dirty {
+  background-color: var(--color-orange);
+  color: #111111;
+  animation: pulse-orange-glow 1.5s infinite alternate;
+}
+
+/* Apply Success flash */
+.apply-btn.success {
+  background-color: var(--color-green);
+  color: #111111;
+  transform: scale(1.1);
+}
+
+.start-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background-color: #2b2b2b;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.start-btn:hover {
+  background-color: #3b3b3b;
+}
+
+.start-btn:active {
+  transform: scale(0.92);
+}
+
+.start-btn.running {
+  background-color: var(--color-red);
+  color: var(--text-primary);
+  animation: pulse-red-glow 1.5s infinite alternate;
+}
+
+/* Bottom Card Container (Dashboard sub-settings panels and D-pad) */
+.dashboard-bottom-card {
+  position: absolute;
+  top: 700px;
+  left: 40px;
+  width: 1360px;
+  height: 280px;
+  background-color: var(--bg-card);
+  border-radius: 24px;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  box-shadow: 0 15px 45px rgba(0,0,0,0.5);
+  overflow: visible;
+}
+
+/* Grid layout rules matching Section 6.C */
+.settings-form-container {
+  height: 100%;
+  padding: 24px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.settings-panel {
+  display: none;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px 24px;
+  width: 100%;
+  height: auto;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.settings-panel.active {
+  display: grid;
+  opacity: 1;
+}
+
+.form-row {
+  display: contents;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+}
+
+.form-group label {
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  letter-spacing: 0.08em;
+}
+
+/* Styles for Range Sliders */
+.slider-group {
+  justify-content: flex-start;
+}
+
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: transparent;
+  outline: none;
+  transition: background 0.2s;
+  cursor: pointer;
+  position: relative;
+  z-index: 5;
+}
+
+.slider::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: transparent;
+}
+
+/* Dynamic progressive fill left of thumb (custom-crafted) */
+.slider-fill-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  height: 38px;
+}
+
+.slider-track-background {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 8px;
+  border-radius: 4px;
+  background-color: #252525;
+  z-index: 1;
+}
+
+.slider-track-glow {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 8px;
+  border-radius: 4px;
+  background-color: var(--color-green);
+  pointer-events: none;
+  box-shadow: 0 0 8px rgba(17, 255, 0, 0.4);
+  z-index: 2;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.2s;
+  margin-top: -6px; /* centers track Chrome/Safari */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+}
+
+.slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 10px rgba(17, 255, 0, 0.8);
+}
+
+/* Text & Path Inputs */
+.text-input {
+  width: 100%;
+  height: 38px;
+  background-color: var(--bg-control);
+  border: 1px solid transparent;
+  color: var(--text-primary);
+  border-radius: 12px;
+  padding: 0 16px;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.text-input:hover {
+  background-color: var(--bg-control-hover);
+  border-color: #444444;
+}
+
+.text-input:focus {
+  background-color: var(--bg-control-hover);
+  border-color: var(--color-green);
+}
+
+/* Form group for Path with Browse button inline */
+.path-input-wrapper {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.path-input-wrapper .text-input {
+  flex-grow: 1;
+}
+
+.btn {
+  height: 38px;
+  padding: 0 20px;
+  background-color: var(--bg-control);
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn:hover {
+  background-color: var(--bg-control-hover);
+  border-color: #444444;
+}
+
+.btn:active {
+  transform: scale(0.96);
+}
+
+/* Custom Toggle Switch (State: On/Off) */
+.toggle-group {
+  width: 110px; /* Thinner */
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  height: 38px;
+}
+
+.toggle-switch {
+  width: 64px;
+  height: 32px;
+  background-color: #252525;
+  border-radius: 16px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  border: 1px solid transparent;
+}
+
+.toggle-switch:hover {
+  border-color: #444444;
+}
+
+.toggle-handle {
+  width: 24px;
+  height: 24px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  position: absolute;
+  left: 3px;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+.toggle-switch.on {
+  background-color: var(--color-green);
+}
+
+.toggle-switch.on .toggle-handle {
+  transform: translateX(32px);
+}
+
+/* D-pad Nudger Section (Section 6.C Alignment) */
+.nudge-control-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-left: 1px solid #222222;
+  height: 100%;
+  width: 100%;
+}
+
+/* Vertical Rotated Text */
+.vertical-label {
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%) rotate(180deg);
+  writing-mode: vertical-rl;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #444444;
+  letter-spacing: 0.15em;
+  white-space: nowrap;
+}
+
+/* D-pad Controller */
+.dpad-controller {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+}
+
+.dpad-bg-wrapper {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Glow Layers precisely overlayed */
+.dpad-glow {
+  position: absolute;
+  top: -8px; left: -8px; right: -8px; bottom: -8px;
+  width: 176px;
+  height: 176px;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  mix-blend-mode: screen;
+  transform-origin: center center;
+}
+
+.dpad-glow.active {
+  opacity: 1;
+}
+
+/* Precise directional rotations are handled elegantly by the inline SVG path coordinates directly for 100% alignment safety */
+#glow-up {
+  transform: none;
+}
+
+#glow-left {
+  transform: none;
+}
+
+#glow-down {
+  transform: none;
+}
+
+#glow-right {
+  transform: none;
+}
+
+/* D-Pad Buttons overlay quadrants matching physical shape precisely */
+.dpad-btn {
+  position: absolute;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+  transition: transform 0.1s;
+}
+
+.dpad-btn.up {
+  top: 0;
+  left: 36px;
+  width: 88px;
+  height: 36px;
+  border-radius: 40px 40px 0 0;
+}
+
+.dpad-btn.left {
+  top: 36px;
+  left: 0;
+  width: 36px;
+  height: 88px;
+  border-radius: 40px 0 0 40px;
+}
+
+.dpad-btn.right {
+  top: 36px;
+  right: 0;
+  width: 36px;
+  height: 88px;
+  border-radius: 0 40px 40px 0;
+}
+
+.dpad-btn.down {
+  bottom: 0;
+  left: 36px;
+  width: 88px;
+  height: 36px;
+  border-radius: 0 0 40px 40px;
+}
+
+/* Absolute centers reset button (invisible physical click target with dome scaling feedback) */
+.dpad-btn.reset {
+  top: 36px;
+  left: 36px;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background-color: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 12;
+  box-shadow: none;
+  transition: transform 0.1s ease;
+}
+
+.dpad-btn.reset:hover {
+  background-color: transparent;
+  border: none;
+}
+
+.dpad-btn.reset:active {
+  transform: scale(0.92);
+  box-shadow: none;
+}
+
+/* Animations */
+@keyframes pulse-green {
+  0% {
+    box-shadow: 0 0 4px var(--color-green);
+  }
+  100% {
+    box-shadow: 0 0 16px var(--color-green), 0 0 24px rgba(17,255,0,0.4);
+  }
+}
+
+@keyframes pulse-orange {
+  0% {
+    box-shadow: 0 0 4px var(--color-orange);
+  }
+  100% {
+    box-shadow: 0 0 16px var(--color-orange);
+  }
+}
+
+@keyframes pulse-yellow {
+  0% {
+    box-shadow: 0 0 4px var(--color-yellow);
+  }
+  100% {
+    box-shadow: 0 0 16px var(--color-yellow);
+  }
+}
+
+@keyframes pulse-orange-glow {
+  0% {
+    box-shadow: 0 0 5px rgba(255,145,0,0.4);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(255,145,0,0.9);
+  }
+}
+
+@keyframes pulse-red-glow {
+  0% {
+    box-shadow: 0 0 5px rgba(255,0,56,0.3);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(255,0,56,0.8);
+  }
+}
+
+/* Background Workspace Grid Deco */
+.shell-grid-decor {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: 
+    radial-gradient(ellipse at 50% 50%, rgba(20,20,20,0.7) 0%, rgba(10,10,10,1) 100%),
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Custom Scrollbar Removal styles */
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+.no-scrollbar {
+  -ms-overflow-style: none !important;  /* IE and Edge */
+  scrollbar-width: none !important;  /* Firefox */
+}

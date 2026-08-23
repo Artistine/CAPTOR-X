@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Google AI Studio App</title>
+    <script>
+      (function() {
+        window._consoleLogs = [];
+        function capture(level) {
+          const original = console[level];
+          return function(...args) {
+            if (original) {
+              try {
+                original.apply(console, args);
+              } catch(e) {}
+            }
+            const msg = args.map(a => {
+              try {
+                return typeof a === 'object' ? JSON.stringify(a) : String(a);
+              } catch(e) {
+                return String(a);
+              }
+            }).join(' ');
+            window._consoleLogs.push({ level: level, msg: msg });
+            if (window.pywebview && window.pywebview.api && window.pywebview.api.js_log) {
+              window.pywebview.api.js_log(level, msg);
+            }
+          };
+        }
+        console.log = capture('log');
+        console.error = capture('error');
+        console.warn = capture('warn');
+        console.info = capture('info');
+
+        window.addEventListener('pywebviewready', function() {
+          if (window.pywebview && window.pywebview.api && window.pywebview.api.js_log) {
+            window._consoleLogs.forEach(function(item) {
+              window.pywebview.api.js_log(item.level, item.msg);
+            });
+            window._consoleLogs = [];
+          }
+        });
+        
+        window.addEventListener('error', function(e) {
+          const msg = e.message + " at " + e.filename + ":" + e.lineno + ":" + e.colno;
+          if (window.pywebview && window.pywebview.api && window.pywebview.api.js_log) {
+            window.pywebview.api.js_log('error', msg);
+          } else {
+            window._consoleLogs.push({ level: 'error', msg: msg });
+          }
+        });
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-DwQ6RMLr.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-C8rXFcvS.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+

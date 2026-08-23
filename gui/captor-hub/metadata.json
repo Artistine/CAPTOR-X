@@ -1,0 +1,6 @@
+{
+  "name": "Captor Hub",
+  "description": "Retro-brutalist custom hardware dashboard for voice indexing, OLED line rendering, and performance telemetry.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

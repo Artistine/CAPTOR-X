@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.ipynb_checkpoints
+.venv/
+venv/
+ENV/
+env/
+
+# PyInstaller
+build/
+dist/
+hmi_pipeline_guide/
+captor_core_icon.ico
+
+# PlatformIO
+.pio/
+.clang_complete
+.gcc-flags.json
+.ipch/
+
+# Node / React
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+gui/dist/
+gui/captor-hub/dist/
+
+# Editor / OS
+.vscode/
+.idea/
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+*.log
+
+# Large Binaries / Compilations / CAD / Media
+Output/
+WinTmp/
+advert/
+enclosure/
+refs/
+**/*.rar
+**/*.zip
+**/*.mov
+**/*.mp4
+**/*.exr
+**/*.blend
+**/*.blend1
+**/*.stp
+**/*.step
+**/*.stl
+**/*.3mf
+**/*.plasticity
+**/*.gif
+!UI/OLED UI/BOOT.gif
+
+
