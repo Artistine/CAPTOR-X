@@ -59,4 +59,14 @@ refs/
 **/*.gif
 !UI/OLED UI/BOOT.gif
 
+# Allow only 3D print files in ENC
+!ENC/
+ENC/**/*
+!ENC/**/
+!ENC/**/*.stl
+!ENC/**/*.stp
+!ENC/**/*.step
+!ENC/**/*.3mf
+
+
 
