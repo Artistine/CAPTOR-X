@@ -50,6 +50,8 @@ import psutil
 from faster_whisper import WhisperModel
 from PIL import Image, ImageDraw, ImageFont, ImageOps, ImageEnhance
 import webview
+import pystray
+
 
 # ── font registration ─────────────────────────────────────────────────────────
 def register_fonts():
@@ -3123,6 +3125,54 @@ if __name__ == "__main__":
     )
     
     app_engine._window = window
+    
+    # ── system tray setup ────────────────────────────────────────────────────────
+    tray_icon = None
+
+    def setup_tray():
+        global tray_icon
+        try:
+            icon_path = "captor_core_icon.ico"
+            if hasattr(sys, "_MEIPASS"):
+                icon_path = os.path.join(sys._MEIPASS, "captor_core_icon.ico")
+            
+            image = Image.open(icon_path)
+        except Exception as e:
+            log.error("Failed to load tray icon image: %s", e)
+            image = Image.new('RGB', (64, 64), color='blue')
+            
+        def on_show(icon, item):
+            window.show()
+
+        def on_exit(icon, item):
+            icon.stop()
+            try:
+                window.events.closing -= on_closing
+            except Exception:
+                pass
+            window.destroy()
+
+        from pystray import MenuItem as item
+        menu = pystray.Menu(
+            item('Show Control Panel', on_show, default=True),
+            item('Exit', on_exit)
+        )
+        
+        tray_icon = pystray.Icon("CaptorCore", image, "Captor Core", menu)
+        threading.Thread(target=tray_icon.run, daemon=True).start()
+
+    def on_closing():
+        window.hide()
+        try:
+            if tray_icon:
+                tray_icon.notify("Captor Core is running in the background.", "System Tray")
+        except Exception:
+            pass
+        return False
+
+    window.events.closing += on_closing
+    setup_tray()
+
     
     def check_js_state():
         time.sleep(5)

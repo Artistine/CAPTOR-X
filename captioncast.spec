@@ -85,5 +85,7 @@ coll = COLLECT(
     strip=False,
     upx=False,
     upx_exclude=[],
-    name='CaptorCoreApp',
+    name='CaptorCoreBuild',
 )
+
+
