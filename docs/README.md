@@ -2,6 +2,8 @@
 
 Realtime speech → OLED display. The PC app captures system playback audio directly, transcribes it to text locally using machine learning models, and streams pixel-perfect graphics over a USB serial connection to a physical Captor X driven SSD1306 OLED screen (128x64).
 
+https://www.behance.net/gallery/254326693/CAPTOR-X-A-MIL-SPEC-DESK-WIDGET
+
 ---
 
 ## Features
