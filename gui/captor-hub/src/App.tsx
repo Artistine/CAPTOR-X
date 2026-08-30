@@ -2100,21 +2100,23 @@ export default function App() {
 
 
 
-                          <div className="form-group">
+                          <div className="form-group input-group">
 
-                            <label>Visualizer Mode</label>
+                            <label>Welcome Text</label>
 
-                            <CustomDropdown 
+                            <input 
 
-                              id="dropdown-visualizer"
+                              type="text" 
 
-                              value={ccSettings.visualizer}
+                              id="input-welcome-text" 
 
-                              options={["Tape Graphics", "Stereo Bars"]}
+                              className="text-input" 
 
-                              onChange={(val) => {
+                              value={ccSettings.welcomeText}
 
-                                setCcSettings(prev => ({ ...prev, visualizer: val }));
+                              onChange={(e) => {
+
+                                setCcSettings(prev => ({ ...prev, welcomeText: e.target.value }));
 
                                 flagSettingsDirty();
 
@@ -2123,6 +2125,7 @@ export default function App() {
                             />
 
                           </div>
+
 
                         </div>
 
@@ -2252,33 +2255,8 @@ export default function App() {
 
 
 
-                          <div className="form-group input-group">
+                         </div>
 
-                            <label>Welcome Text</label>
-
-                            <input 
-
-                              type="text" 
-
-                              id="input-welcome-text" 
-
-                              className="text-input" 
-
-                              value={ccSettings.welcomeText}
-
-                              onChange={(e) => {
-
-                                setCcSettings(prev => ({ ...prev, welcomeText: e.target.value }));
-
-                                flagSettingsDirty();
-
-                              }}
-
-                            />
-
-                          </div>
-
-                        </div>
 
 
 

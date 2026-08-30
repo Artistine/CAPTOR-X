@@ -3115,13 +3115,16 @@ if __name__ == "__main__":
     app_engine = AppEngine()
     bridge = APIBridge(app_engine)
 
+    start_minimized = "--minimized" in sys.argv
+
     window = webview.create_window(
         title='Captor Core', 
         url='gui/index.html?native=true',
         js_api=bridge,
         width=1096,
         height=804,
-        resizable=False
+        resizable=False,
+        hidden=start_minimized
     )
     
     app_engine._window = window
@@ -3132,7 +3135,7 @@ if __name__ == "__main__":
     def setup_tray():
         global tray_icon
         try:
-            icon_path = "captor_core_icon.ico"
+            icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "captor_core_icon.ico")
             if hasattr(sys, "_MEIPASS"):
                 icon_path = os.path.join(sys._MEIPASS, "captor_core_icon.ico")
             

@@ -7,7 +7,7 @@ from PyInstaller.utils.hooks import collect_all
 
 block_cipher = None
 
-datas = [('fonts', 'fonts'), ('gui/index.html', 'gui'), ('gui/assets', 'gui/assets')]
+datas = [('fonts', 'fonts'), ('gui/index.html', 'gui'), ('gui/assets', 'gui/assets'), ('captor_core_icon.ico', '.')]
 binaries = [('LibreHardwareMonitorLib.dll', '.')]
 hiddenimports = [
     'tkinter',

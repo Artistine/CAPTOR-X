@@ -10,7 +10,7 @@ if %errorLevel% == 0 (
     echo [INFO] Registering Task Scheduler task for CaptorCore...
     
     powershell -NoProfile -Command ^
-        "$Action = New-ScheduledTaskAction -Execute '%EXE_PATH%' -WorkingDirectory '%WORKING_DIR%';" ^
+        "$Action = New-ScheduledTaskAction -Execute '%EXE_PATH%' -Argument '--minimized' -WorkingDirectory '%WORKING_DIR%';" ^
         "$Trigger = New-ScheduledTaskTrigger -AtLogOn;" ^
         "$Settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -Priority 4;" ^
         "$Principal = New-ScheduledTaskPrincipal -UserId \"$env:USERDOMAIN\$env:USERNAME\" -LogonType Interactive -RunLevel Highest;" ^
