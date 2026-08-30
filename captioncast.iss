@@ -8,7 +8,7 @@
 
 [Setup]
 AppName=Captor Core
-AppVersion=1.0.0
+AppVersion=1.0.1
 AppPublisher=Captor Core Team
 DefaultDirName={autopf}\Captor Core
 DefaultGroupName=Captor Core

@@ -3062,6 +3062,13 @@ if __name__ == "__main__":
     import sys
     import os
 
+    # Register explicit AppUserModelID on Windows for correct toast notification icons
+    if sys.platform == "win32":
+        try:
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("Captor Core")
+        except Exception:
+            pass
+
     # Ensure working directory is set to the script's directory
     script_path = os.path.abspath(sys.argv[0])
     script_dir = os.path.dirname(script_path)
@@ -3129,6 +3136,24 @@ if __name__ == "__main__":
     
     app_engine._window = window
     
+    # Monkey-patch pystray Windows notify method to show our icon in toast notifications
+    if sys.platform == "win32":
+        try:
+            import pystray._win32
+            
+            def patched_notify(self, message, title=None):
+                self._message(
+                    pystray._win32.win32.NIM_MODIFY,
+                    pystray._win32.win32.NIF_INFO,
+                    szInfo=message,
+                    szInfoTitle=title or self.title or '',
+                    dwInfoFlags=4 | 32  # NIIF_USER (4) | NIIF_LARGE_ICON (32) to use tray icon!
+                )
+                
+            pystray._win32.Icon._notify = patched_notify
+        except Exception as e:
+            log.error("Failed to patch pystray Win32 notify: %s", e)
+
     # ── system tray setup ────────────────────────────────────────────────────────
     tray_icon = None
 

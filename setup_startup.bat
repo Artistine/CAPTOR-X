@@ -1,6 +1,9 @@
 @echo off
-set "EXE_PATH=E:\captioncast\captioncast\dist\CaptorCoreBuild\CaptorCore.exe"
-set "WORKING_DIR=E:\captioncast\captioncast\dist\CaptorCoreBuild"
+set "CURRENT_DIR=%~dp0"
+if "%CURRENT_DIR:~-1%"=="\" set "CURRENT_DIR=%CURRENT_DIR:~0,-1%"
+
+set "EXE_PATH=%CURRENT_DIR%\CaptorCore.exe"
+set "WORKING_DIR=%CURRENT_DIR%"
 set "TASK_NAME=CaptorCoreStartup"
 
 :: Check for administrative privileges
